@@ -160,8 +160,3 @@ telecom-churn-prediction/
 ```
 
 ---
-
-## 👤 Author
-
-Developed as part of the **Rubixe™ Data Science Project **  
-Project Reference: **PM-PR-0017**
