@@ -1,214 +1,167 @@
-📊 Telecom Customer Churn Prediction (Machine Learning)
+# 📡 Telecom Customer Churn Prediction
 
-A Machine Learning project that predicts whether a telecom customer is likely to churn (leave the service) using historical customer usage data.
-The model helps telecom companies identify high-risk customers and take proactive retention actions.
+**Client:** No-Churn Telecom | **Project Ref:** PM-PR-0017 | **Date:** December 2025  
 
-🚀 Project Overview
+---
 
-Customer churn is a major challenge in the telecom industry. Acquiring new customers costs significantly more than retaining existing ones.
+## 🧩 Business Problem
 
-This project builds a predictive Machine Learning model that identifies customers likely to churn so businesses can:
+No-Churn Telecom is an established European telecom operator facing intense competition from new market entrants. Despite initiatives such as tariff reductions and promotional campaigns, the company's **churn rate remained above 10%**, directly impacting revenue and market share.
 
-Reduce customer churn
+The goal of this project was to leverage Machine Learning to **proactively identify customers at risk of churning**, enabling targeted retention campaigns before customers leave.
 
-Improve retention strategies
+---
 
-Launch targeted marketing campaigns
+## 🎯 Project Goals
 
-Increase long-term revenue
+| # | Goal |
+|---|------|
+| 1 | Identify the key variables driving customer migration to competitors |
+| 2 | Generate **Churn Risk Scores** (0–1 probability) to power retention campaigns |
+| 3 | Introduce a new binary variable **`CHURN-FLAG`** (YES / NO) for priority customer handling |
 
-The final model predicts:
+> **Additional Use Case:** Auto-prioritize support tickets, ensure faster request fulfillment, and enable proactive outreach for all `CHURN-FLAG = YES` customers.
 
-Churn Probability (0–1 score)
+---
 
-CHURN-FLAG (YES / NO) for high-risk customers
+## 📦 Dataset
 
-🏢 Business Problem
+| Attribute | Details |
+|-----------|---------|
+| Source | SQL Database (`project_telecom`) |
+| Table | `telecom_churn_data` |
+| Total Records | 4,617 |
+| Target Variable | `Churn` (Yes / No) |
 
-No-Churn Telecom is facing increasing customer churn due to market competition. Despite promotions and price reductions, the churn rate remains above 10%.
+### Features
 
-The company wants to:
+The dataset contains 21 columns covering customer account and usage information:
 
-1️⃣ Identify factors driving customer churn
-2️⃣ Predict churn probability using Machine Learning
-3️⃣ Flag high-risk customers for retention campaigns
+| Category | Features |
+|----------|----------|
+| Account Info | State, Account Length, Area Code, Phone |
+| Plan Info | International Plan, VMail Plan, VMail Message |
+| Day Usage | Day Mins, Day Calls, Day Charge |
+| Evening Usage | Eve Mins, Eve Calls, Eve Charge |
+| Night Usage | Night Mins, Night Calls, Night Charge |
+| International Usage | International Mins, International Calls, International Charge |
+| Support | CustServ Calls |
+| Target | Churn (Yes / No) |
 
-📂 Dataset Information
-Attribute	Details
-Industry	Telecom
-Total Records	4617
-Target Variable	Churn (Yes / No)
-Data Source	SQL Database
-Features	Customer usage, plans, call minutes, customer service calls
-🧠 Machine Learning Workflow
+---
 
-The project follows a complete end-to-end ML pipeline.
+## 🔧 Tech Stack
 
-1️⃣ Data Collection
+```
+Python 3.13
+├── Data            : pandas, numpy, pymysql
+├── Visualization   : matplotlib, seaborn
+├── Preprocessing   : scikit-learn (LabelEncoder, train_test_split)
+├── Imbalance       : imbalanced-learn (SMOTE)
+└── Modeling        : scikit-learn (RandomForestClassifier, GridSearchCV)
+```
 
-Telecom customer dataset extracted from SQL database.
+---
 
-2️⃣ Data Preprocessing
+## 🔬 Methodology
 
-Handling missing values
+### 1. Data Extraction
+- Connected to a remote MySQL database and loaded the full `telecom_churn_data` table using `pymysql` and `pandas.read_sql`.
 
-Encoding categorical variables
+### 2. Exploratory Data Analysis (EDA)
+- Inspected data shape, dtypes, null values, and descriptive statistics.
+- Plotted distribution histograms and boxplots for all numeric columns to understand feature spread and detect outliers.
+- Analyzed churn vs. non-churn distributions across key variables.
 
-Feature selection
+### 3. Data Preprocessing
+- Renamed all 21 columns to clean, readable labels.
+- Applied **Label Encoding** to categorical variables (`International Plan`, `VMail Plan`, `Churn`).
+- Dropped non-predictive identifier columns (`Phone`, `State`, `Area Code`).
 
-Removing redundant variables
+### 4. Handling Class Imbalance
+- The dataset had a significant class imbalance (churn minority class).
+- Applied **SMOTE (Synthetic Minority Over-sampling Technique)** on the training set to balance classes before model training.
 
-3️⃣ Exploratory Data Analysis (EDA)
+### 5. Model Training & Tuning
+- Split data into **80% train / 20% test**.
+- Trained a **Random Forest Classifier** as the base model.
+- Used **GridSearchCV** with cross-validation to tune hyperparameters:
+  - `n_estimators`, `max_depth`, `min_samples_split`, `min_samples_leaf`
 
-Key insights discovered:
+### 6. Prediction & Output Generation
+- Generated `CHURN_RISK_SCORE` — a continuous probability score between 0 and 1 for every customer.
+- Generated `CHURN-FLAG` — a binary YES/NO flag based on the model's classification threshold.
+- Exported the **Top 100 High-Risk Customers** sorted by descending risk score.
 
-International Plan strongly increases churn risk
+---
 
-Customer Service Calls indicate dissatisfaction
+## 📊 Model Performance
 
-Day Minutes usage correlates with churn
+| Metric | Value |
+|--------|-------|
+| Final Model | Random Forest + SMOTE + GridSearchCV |
+| ROC-AUC Score | **0.904** |
+| Churn Recall | **74%** |
 
-Voicemail Plan reduces churn probability
+The model achieves strong discriminative ability (AUC = 0.904) with a recall of 74% on the churn class — meaning it successfully identifies nearly 3 out of 4 customers who will churn, while remaining production-ready and avoiding excessive false positives.
 
-4️⃣ Handling Imbalanced Data
+---
 
-Used SMOTE (Synthetic Minority Oversampling Technique) to balance churn classes.
+## 📤 Deliverables
 
-5️⃣ Model Training
+| Deliverable | Status | Output |
+|-------------|--------|--------|
+| Churn Drivers Analysis | ✅ Completed | EDA + Feature Importance plots |
+| Churn Risk Score | ✅ Completed | `CHURN_RISK_SCORE` column (0–1) |
+| Predictive CHURN-FLAG | ✅ Completed | `CHURN-FLAG` column (YES / NO) |
+| Top 100 High-Risk Customers | ✅ Completed | Exported CSV |
 
-Algorithms used:
+---
 
-Random Forest Classifier
+## 💼 Business Impact
 
-GridSearchCV for hyperparameter tuning
+- **30–50% expected reduction** in customer churn through targeted retention
+- Enables campaigns focused on the **top 100–500 highest-risk customers**
+- Significant **cost savings** on customer acquisition by retaining existing customers
+- Supports **priority support routing** for high-risk customers (`CHURN-FLAG = YES`)
 
-6️⃣ Model Evaluation
+---
 
-Metrics used:
+## 🚀 How to Run
 
-Accuracy
+1. **Clone the repository**
+   ```bash
+   git clone <repo-url>
+   cd telecom-churn-prediction
+   ```
 
-Precision
+2. **Install dependencies**
+   ```bash
+   pip install pandas numpy pymysql matplotlib seaborn scikit-learn imbalanced-learn
+   ```
 
-Recall
+3. **Open the notebook**
+   ```bash
+   jupyter notebook Telecom_ChurnRateMl.ipynb
+   ```
 
-F1 Score
+4. **Run all cells** — the notebook will connect to the database, run EDA, train the model, and output risk scores and churn flags.
 
-ROC-AUC Score
+---
 
-📈 Model Performance
-Metric	Score
-Accuracy	91%
-ROC-AUC	0.904
-Churn Recall	74%
+## 📁 Project Structure
 
-The model successfully identifies 74% of customers likely to churn.
-
-🔑 Key Churn Drivers
-
-Top factors influencing churn:
-
-1️⃣ International Plan
-2️⃣ Day Minutes Usage
-3️⃣ Customer Service Calls
-4️⃣ Voicemail Plan
-5️⃣ Evening Minutes Usage
-
-🧾 Final Deliverables
-
-The model generates:
-
-Output	Description
-CHURN_RISK_SCORE	Probability of churn (0–1)
-CHURN_FLAG	YES / NO prediction
-High Risk Customers	Top customers for retention campaigns
-🛠 Tech Stack
-
-Programming Language
-
-Python
-
-Libraries Used
-
-Pandas
-
-NumPy
-
-Matplotlib
-
-Seaborn
-
-Scikit-learn
-
-Imbalanced-learn (SMOTE)
-
-PyMySQL
-
-Machine Learning
-
-Random Forest
-
-GridSearchCV
-
-SMOTE
-
-📊 Project Structure
-Telecom-Churn-Prediction
+```
+telecom-churn-prediction/
 │
-├── Telecom_ChurnRateMl.ipynb
-├── churn_dataset.csv
-├── README.md
-└── requirements.txt
-💻 Installation
+├── Telecom_ChurnRateMl.ipynb    # Main project notebook
+├── README.md                    # Project documentation
+└── high_risk_customers.csv      # Top 100 high-risk customer export
+```
 
-Clone the repository:
+---
 
-git clone https://github.com/your-username/telecom-churn-prediction.git
+## 👤 Author
 
-Install dependencies:
-
-pip install -r requirements.txt
-
-Run the notebook:
-
-jupyter notebook
-📌 Business Impact
-
-Using this model, telecom companies can:
-
-Identify high-risk customers early
-
-Run targeted retention campaigns
-
-Reduce churn by 30–50%
-
-Improve customer satisfaction
-
-📷 Example Use Case
-
-The system flags customers such as:
-
-Customer ID: 10234
-Churn Risk Score: 0.87
-CHURN_FLAG: YES
-
-This allows the business to offer discounts, loyalty rewards, or proactive support.
-
-📚 Future Improvements
-
-Possible enhancements:
-
-Deploy model using FastAPI / Flask
-
-Build a customer churn dashboard
-
-Add real-time churn prediction
-
-Train advanced models like XGBoost / LightGBM
-
-👨‍💻 Author
-
-Dhwanit Chokshi
-
-Aspiring AI Engineer & Data Scientist
-Skilled in Machine Learning, Generative AI, and Data Analysis
+Developed as part of the **Rubixe™ Data Science Project **  
+Project Reference: **PM-PR-0017**
